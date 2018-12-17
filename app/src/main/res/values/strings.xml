@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Arketype</string>
+    <string name="title_wallet_detail">Wallet Detail</string>
+    <string name="title_activity_main">MainActivity</string>
+</resources>
