@@ -1,0 +1,7 @@
+{
+  "client_id": "Arketype",
+  "redirect_uri": "network.arkane.arketype://oauth2redirect",
+  "authorization_scope": "openid",
+  "discovery_uri": "https://login-staging.arkane.network/auth/realms/Arkane/.well-known/openid-configuration",
+  "https_required": true
+}

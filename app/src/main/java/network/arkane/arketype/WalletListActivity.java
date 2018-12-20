@@ -7,16 +7,16 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import network.arkane.arketype.dummy.DummyContent;
-
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import network.arkane.arketype.client.model.Wallet;
 
 /**
  * An activity representing a list of Wallets. This activity
@@ -33,11 +33,34 @@ public class WalletListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private ExecutorService mExecutor;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mExecutor.isShutdown()) {
+            mExecutor = Executors.newSingleThreadExecutor();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mExecutor.shutdownNow();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
+        mExecutor = Executors.newSingleThreadExecutor();
+        WalletListIntentData data = (WalletListIntentData) getIntent().getExtras().get("wallets");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -53,26 +76,26 @@ public class WalletListActivity extends AppCompatActivity {
 
         View recyclerView = findViewById(R.id.wallet_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView((RecyclerView) recyclerView, data.getWallets());
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<Wallet> wallets) {
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, wallets, mTwoPane));
     }
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final WalletListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<Wallet> mValues;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                Wallet item = (Wallet) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(WalletDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putSerializable("wallet", item);
                     WalletDetailFragment fragment = new WalletDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -81,7 +104,7 @@ public class WalletListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, WalletDetailActivity.class);
-                    intent.putExtra(WalletDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra("wallet", item);
 
                     context.startActivity(intent);
                 }
@@ -89,7 +112,7 @@ public class WalletListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(WalletListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      List<Wallet> items,
                                       boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
@@ -105,8 +128,8 @@ public class WalletListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mDescriptionView.setText(mValues.get(position).getDescription());
+            holder.mAddressView.setText(mValues.get(position).getAddress());
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -118,13 +141,13 @@ public class WalletListActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
+            final TextView mDescriptionView;
+            final TextView mAddressView;
 
             ViewHolder(View view) {
                 super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mDescriptionView = (TextView) view.findViewById(R.id.wallet_description);
+                mAddressView = (TextView) view.findViewById(R.id.wallet_address);
             }
         }
     }
