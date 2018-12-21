@@ -412,7 +412,8 @@ public final class LoginActivity extends AppCompatActivity {
             authRequestBuilder.setLoginHint(loginHint);
         }
         HashMap<String, String> additionalParameters = new HashMap<>();
-        additionalParameters.put("kc_idp_hint", "google");
+        // you can enforce your users to use a specific IDP like: google or facebook
+        // additionalParameters.put("kc_idp_hint", "google");
         authRequestBuilder.setAdditionalParameters(additionalParameters);
         mAuthRequest.set(authRequestBuilder.build());
     }
