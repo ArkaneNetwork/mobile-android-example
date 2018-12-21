@@ -119,6 +119,7 @@ public class TokenActivity extends AppCompatActivity {
                 Log.e(TAG, "Failed to parse saved user info JSON, discarding", ex);
             }
         }
+
     }
 
     @Override
@@ -155,10 +156,23 @@ public class TokenActivity extends AppCompatActivity {
     }
 
     public void manageWallets() {
-        String url = "https://connect-staging.arkane.network/wallets/manage?redirectUri=network.arkane.arketype://oauth2redirect&data=eyJjaGFpbiI6ICJldGhlcmV1bSJ9&bearerToken=";
-        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        CustomTabsIntent customTabsIntent = builder.build();
-        customTabsIntent.launchUrl(this, Uri.parse(url));
+        AuthState state = mStateManager.getCurrent();
+        state.performActionWithFreshTokens(mAuthService, (accessToken, idToken, ex) -> {
+            String url = "https://connect-staging.arkane.network/wallets/manage?redirectUri=network.arkane://callback&data=eyJjaGFpbiI6ICJldGhlcmV1bSJ9&bearerToken=" + accessToken;
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.launchUrl(this, Uri.parse(url));
+        });
+    }
+
+    public void linkWallets() {
+        AuthState state = mStateManager.getCurrent();
+        state.performActionWithFreshTokens(mAuthService, (accessToken, idToken, ex) -> {
+            String url = "https://connect-staging.arkane.network/wallets/link?redirectUri=network.arkane://callback&bearerToken=" + accessToken;
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.launchUrl(this, Uri.parse(url));
+        });
     }
 
     private void getWallets() {
@@ -183,6 +197,11 @@ public class TokenActivity extends AppCompatActivity {
         if (mUserInfoJson.get() != null) {
             state.putString(KEY_USER_INFO, mUserInfoJson.toString());
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override
@@ -246,6 +265,12 @@ public class TokenActivity extends AppCompatActivity {
 
         Button getWalletsButton = (Button) findViewById(R.id.get_wallets);
         getWalletsButton.setOnClickListener((View view) -> getWallets());
+
+        Button manageWalletsButton = (Button) findViewById(R.id.manage_wallets);
+        manageWalletsButton.setOnClickListener((View view) -> manageWallets());
+
+        Button linkWalletsButton = (Button) findViewById(R.id.link_wallets);
+        linkWalletsButton.setOnClickListener((View view) -> linkWallets());
 
         Button viewProfileButton = (Button) findViewById(R.id.view_profile);
 
@@ -441,4 +466,5 @@ public class TokenActivity extends AppCompatActivity {
         startActivity(mainIntent);
         finish();
     }
+
 }

@@ -23,10 +23,10 @@
             android:orientation="vertical" >
 
             <ImageView
-                android:layout_width="300dp"
+                android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/arkanefull"
+                app:srcCompat="@drawable/arketype"
                 android:contentDescription="@string/openid_logo_content_description"/>
 
             <TextView

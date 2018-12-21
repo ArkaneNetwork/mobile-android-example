@@ -55,6 +55,16 @@
                     android:path="/oauth2redirect"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".ArkaneCallbackActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="network.arkane"
+                    android:host="callback"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
