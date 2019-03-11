@@ -158,7 +158,7 @@ public class TokenActivity extends AppCompatActivity {
     public void manageWallets() {
         AuthState state = mStateManager.getCurrent();
         state.performActionWithFreshTokens(mAuthService, (accessToken, idToken, ex) -> {
-            String url = "https://connect-staging.arkane.network/wallets/manage?redirectUri=network.arkane://callback&data=eyJjaGFpbiI6ICJldGhlcmV1bSJ9&bearerToken=" + accessToken;
+            String url = "https://connect-staging.arkane.network/wallets/manage?redirectUri=network.arkane%3A%2F%2Fcallback&data=eyJjaGFpbiI6ICJldGhlcmV1bSJ9&bearerToken=" + accessToken;
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.launchUrl(this, Uri.parse(url));
@@ -168,7 +168,7 @@ public class TokenActivity extends AppCompatActivity {
     public void linkWallets() {
         AuthState state = mStateManager.getCurrent();
         state.performActionWithFreshTokens(mAuthService, (accessToken, idToken, ex) -> {
-            String url = "https://connect-staging.arkane.network/wallets/link?redirectUri=network.arkane://callback&bearerToken=" + accessToken;
+            String url = "https://connect-staging.arkane.network/wallets/link?redirectUri=network.arkane%3A%2F%2Fcallback&bearerToken=" + accessToken;
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.launchUrl(this, Uri.parse(url));
